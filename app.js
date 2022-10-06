@@ -4,7 +4,8 @@ const express = require("express");
 const bodParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+// const encrypt = require("mongoose-encryption");
+const md5 = require("md5"); //md5 is used to hash strings in this case psswds
 
 const app = express();
 
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema({
 
 //use encrypt plugin and only encrypt password
 //make sure that encryptedfields matches the same name in schema fields
-userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});
+// userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]});
 
 
 const User = new mongoose.model("User", userSchema);   
@@ -46,7 +47,7 @@ app.post("/register", function(req, res){
     //create new user doc in userDB
     const newUser = new User({
         email: req.body.username,
-        password: req.body.password
+        password: md5(req.body.password) //hash password with md5
     });
 
     //save user to db and render secrets page if successful
@@ -62,7 +63,7 @@ app.post("/register", function(req, res){
 app.post("/login", function(req, res){
     //store requested values in variables 
     const username = req.body.username;
-    const password = req.body.password;
+    const password = md5(req.body.password); //hash psswd here so it matches the hashed psswd in db
 
     //find user in db using email
     User.findOne({email: username}, function(err, foundUser){
