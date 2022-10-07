@@ -4,8 +4,10 @@ const express = require("express");
 const bodParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const saltRounds = 10; //the higher the num the harder comp would have to work to create hashes
 // const encrypt = require("mongoose-encryption");
-const md5 = require("md5"); //md5 is used to hash strings in this case psswds
+// const md5 = require("md5"); //md5 is used to hash strings in this case psswds
 
 const app = express();
 
@@ -44,26 +46,32 @@ app.get("/register", function(req, res){
 });
 
 app.post("/register", function(req, res){
-    //create new user doc in userDB
-    const newUser = new User({
-        email: req.body.username,
-        password: md5(req.body.password) //hash password with md5
+
+    //salth and hash password entered by user in registration and save to db 
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash){
+        //create new user doc in userDB
+        const newUser = new User({
+            email: req.body.username,
+            password: hash //salted and hashed password 
+        });
+
+        //save user to db and render secrets page if successful
+        newUser.save(function(err){
+            if(!err){
+                res.render("secrets");
+            } else{
+                console.log(err);
+            }
+        });
     });
 
-    //save user to db and render secrets page if successful
-    newUser.save(function(err){
-        if(!err){
-            res.render("secrets");
-        } else{
-            console.log(err);
-        }
-    });
+    
 });
 
 app.post("/login", function(req, res){
     //store requested values in variables 
     const username = req.body.username;
-    const password = md5(req.body.password); //hash psswd here so it matches the hashed psswd in db
+    const password = req.body.password;
 
     //find user in db using email
     User.findOne({email: username}, function(err, foundUser){
@@ -71,11 +79,12 @@ app.post("/login", function(req, res){
             console.log(err);
         } else{
             if(foundUser){
-                //if user found then check if password matches
-                if(foundUser.password === password){
-                    //if both username and password match then render secrets page
-                    res.render("secrets");
-                }
+                //if user found then check if password entered by user matches hashed psswd in db
+                bcrypt.compare(password, foundUser.password, function(err, result){
+                    if(result === true){
+                        res.render("secrets");
+                    }
+                });
             }
         }
     });
