@@ -1,0 +1,29 @@
+Authentication and Security
+
+Don't ever put your api tokens, passwords and other sensitive information as plain text in repository. Once these repos get pushed on to GitHub they are available for everyone to see and search online.
+
+.env --> use to store api token and other secrets that you do not want to be shown in plain text in code. You can then add this file to your .gitignore file so it does not get pushed for the public to see.
+
+When creating web apps you'll typically have users create accounts so they can access their profiles.
+Protecting user data is a very big factor when creating sites. If your site has been around long enough you will eventually get hacked but there are several steps we can take to combat this,
+
+All of these packages mentions can be installed with npm
+
+mongoose-encryption --> simply encryption and authentication for mongoose documents. Encryption and decryption happen transparently during save and find.
+
+md5 --> used to hash messages. In this case it is used to hash passwords.
+
+bcrypt --> salts hashed passwords to make them a lot more secure.
+
+What is hashing?
+Hashing is a form of encrypting strings to unreadable strings containing numbers and letter.
+
+Although hashing alone is safer than plain text it is not the safest and can be decrypted fairly easily. When a string is hashed it is always going to be the same hash for that string which makes this vulnerable to hackers. Hashes can be entered into google and be found in hash tables created by others online which show the decrypted message. 
+
+What is salting?
+Salting takes Hashing a little further by generating some random numbers and combining it with the hash. Adding salt increase the complexity of hash, increases the number of characters and makes our user db a lot more secure.
+
+Salt rounds --> how many rounds are you going to salt your password with. The more rounds you add the harder your computer will have to work to create these hashes but the more secure it will be from hackers. You can add more salt round every year since computers tend to become faster over time according to Moore's Law. 
+
+
+
