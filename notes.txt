@@ -25,5 +25,26 @@ Salting takes Hashing a little further by generating some random numbers and com
 
 Salt rounds --> how many rounds are you going to salt your password with. The more rounds you add the harder your computer will have to work to create these hashes but the more secure it will be from hackers. You can add more salt round every year since computers tend to become faster over time according to Moore's Law. 
 
+What is Oauth 2.0?
+OAuth is used to authenticate users through a third party such as Facebook, twitter, google, etc.
+This gives us less liability because the users credentials would be protected by that third party 
 
+Why OAuth?
+1. Gives granular access meaning the app developer can determine what kind of data they needs from the user's third party account and request those accordingly
+
+2. It allows for read/read+write access 
+
+3. Revoke access meaning user can deauthorize your web app from their third party account
+
+Step 1 - Set up your app to get app id
+Step 2 - Redirect to authenticate through 3rd party
+Step 3 - User logs in 
+Step 4 - User grants permissions 
+Step 5 - Receive authorization code which allows to check that the user successfully logged on through third party 
+Step 6 - Exchange AuthCode for AccessToken to save onto db. We can use this token to access pieces of information we want from the user through that third party app
+
+Auth Code can be thought about as a single day ticket &
+Access Token can be thought about as an annual pass 
+
+For this project we will log in with google using passport and google OAuth
 
