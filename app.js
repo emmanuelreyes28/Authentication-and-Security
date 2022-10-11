@@ -32,7 +32,8 @@ mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 //need to create a new mongoose.Schema when using encryption
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String
+    password: String,
+    googleId: String
 });
 
 //use plugin to salt and hash psswds. Save users to mongoDB
@@ -66,8 +67,7 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:3000/auth/google/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
-    console.log("hellooooo");
+    //console.log(profile);
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user);
     });
