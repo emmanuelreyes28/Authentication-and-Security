@@ -33,7 +33,8 @@ mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
-    googleId: String
+    googleId: String,
+    secret: String
 });
 
 //use plugin to salt and hash psswds. Save users to mongoDB
@@ -99,13 +100,50 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req, res){
-    //if user is authenticated then render secrets page
+    //look through db and pick the users that have a secret written/not null
+    User.find({"secret": {$ne: null}}, function(err, foundUsers){
+        if(err){
+            console.log(err);
+        } else{
+            if(foundUsers){
+                //userWithSecrets is an array of user objects that we can use to iterate through
+                //in secrets.ejs and render their secrets
+                res.render("secrets", {usersWithSecrets: foundUsers});
+            }
+        }
+    });
+});
+
+app.get("/submit", function (req, res){
+    //if user is authenticated then render submit page
     if(req.isAuthenticated()){
-        res.render("secrets");
+        res.render("submit");
     } else{
         //otherwise prompt user to login
         res.redirect("/login");
     }
+});
+
+app.post("/submit", function(req, res){
+    //store secret entered by user 
+    const submittedSecret = req.body.secret;
+
+    console.log(req.user.id);
+
+    //store secret in db by using user id 
+    User.findById(req.user.id, function(err, foundUser){
+        if(err){
+            console.log(err);
+        } else{
+            if(foundUser){
+                foundUser.secret = submittedSecret;
+                //save entry to db and redirect user to secrets page to see all secrets
+                foundUser.save(function(){
+                    res.redirect("/secrets");
+                });
+            }
+        }
+    });
 });
 
 //when user logs out then the cookie will be cleared and user will have to login again if they want to view secrets page
